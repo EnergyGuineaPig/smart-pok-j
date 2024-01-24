@@ -1,40 +1,44 @@
-//YWROBOT
-//Compatible with the Arduino IDE 1.0
-//Library version:1.1
+//energy Guinea pig
+//smart pokój
+#include <NewPing.h>  //importujemy biblioteke
 #include <Wire.h> 
 #include <LiquidCrystal_I2C.h>
 
 LiquidCrystal_I2C lcd(0x27,20,4);  // set the LCD address to 0x27 for a 16 chars and 2 line display
 
-void setup()
-{
-pinMode(13, OUTPUT);
-pinMode(1, INPUT);
+#define TRIGER 6    //definiujemy zmienne, potem wystarczy tylko zmiana w 1 miejscu numeru pina jezeli go zmienimy
+#define ECHO 7
+#define DISTANCE 200  //maksymalny dystans pomiaru w cm, czujnik dziala do 4-5 metrów
 
-}
+NewPing sonar(TRIGER, ECHO, DISTANCE);
 
 
-void loop()
-{
+
+void setup() {
+ Serial.begin(9600); //inicjalizacja serial monitora
+  pinMode(13, OUTPUT);
   lcd.init();                      // initialize the lcd 
   lcd.init();
-  // Print a message to the LCD.
+}
+
+void loop() {
+
+delay(100);
+unsigned int pomiar = sonar.ping_cm();  //funkcja odczytu odleglosci w cm
+Serial.print("Odleglosc: ");
+Serial.print(pomiar);
+Serial.println("cm");
+if(pomiar > 1){
+  digitalWrite(13, HIGH);
+  lcd.backlight();
+  lcd.setCursor(3,0);
+  lcd.print("alarm!!!                         ");
+  delay(500);
+}else{
+  digitalWrite(13, LOW);
   lcd.backlight();
   lcd.setCursor(3,0);
   lcd.print("smart pokoj");
   delay(500);
-  lcd.backlight();
-  lcd.setCursor(3,0);
-  lcd.print("systemy                      ");
-  delay(500);
-  lcd.backlight();
-  lcd.setCursor(3,0);
-  lcd.print("gotowe                      ");
-  delay(500);
-  if(digitalRead(1 == HIGH)){
-    digitalWrite(13, HIGH);
-  } else {
-    digitalWrite(13, LOW);
-  }
-
+}
 }
